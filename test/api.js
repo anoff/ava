@@ -21,7 +21,6 @@ test('must be called with new', function (t) {
 
 generateTests('Without Pool: ', function (options) {
 	options = options || {};
-	options.powerAssert = true;
 	options.pkgDir = options.pkgDir || pkgDir;
 	return new Api(options);
 });
@@ -67,7 +66,6 @@ test('Without Pool: test files can be forced to run in exclusive mode', function
 generateTests('With Pool: ', function (options) {
 	options = options || {};
 	options.concurrency = 2;
-	options.powerAssert = true;
 	options.pkgDir = options.pkgDir || pkgDir;
 	return new Api(options);
 });
@@ -667,39 +665,6 @@ function generateTests(prefix, apiCreator) {
 			/* eslint no-new: 0 */
 			apiCreator({require: ['foo-bar']});
 		}, /^Could not resolve required module 'foo-bar'$/);
-	});
-
-	test(prefix + 'power-assert support', function (t) {
-		t.plan(4);
-
-		var api = apiCreator({
-			babelConfig: {
-				presets: ['react', 'es2015', 'stage-2']
-			}
-		});
-
-		return api.run([path.join(__dirname, 'fixture/power-assert.js')])
-			.then(function (result) {
-				t.match(
-					result.errors[0].error.message,
-					/t\.true\(a === 'bar'\)\s*\n\s+\|\s*\n\s+"foo"/m
-				);
-
-				t.match(
-					result.errors[1].error.message,
-					/with message\s+t\.true\(a === 'foo', 'with message'\)\s*\n\s+\|\s*\n\s+"bar"/m
-				);
-
-				t.match(
-					result.errors[2].error.message,
-					/t\.true\(o === \{ ...o \}\)\s*\n\s+\|\s*\n\s+Object\{\}/m
-				);
-
-				t.match(
-					result.errors[3].error.message,
-					/t\.true\(<div \/> === <span \/>\)/m
-				);
-			});
 	});
 
 	test(prefix + 'caching is enabled by default', function (t) {
